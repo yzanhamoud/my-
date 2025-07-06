@@ -1,0 +1,27 @@
+document.addEventListener('DOMContentLoaded', function() {
+    const commissionForm = document.getElementById('commissionForm');
+    if (commissionForm) {
+        commissionForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const sellerId = document.getElementById('sellerId').value;
+            const rate = document.getElementById('rate').value;
+            const resultDiv = document.getElementById('commissionResult');
+            resultDiv.innerHTML = '<span class="text-info">جاري التحديث...</span>';
+            try {
+                const res = await fetch(`/api/set-commission/${sellerId}`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ rate: rate })
+                });
+                const json = await res.json();
+                if (res.ok) {
+                    resultDiv.innerHTML = `<span class="text-success">تم التحديث بنجاح: ${JSON.stringify(json)}</span>`;
+                } else {
+                    resultDiv.innerHTML = `<span class="text-danger">خطأ: ${json.message || 'حدث خطأ ما'}</span>`;
+                }
+            } catch (err) {
+                resultDiv.innerHTML = `<span class="text-danger">فشل الاتصال بالخادم</span>`;
+            }
+        });
+    }
+});
